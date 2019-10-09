@@ -4,6 +4,8 @@ import { Thread } from './thread.model';
 import { Message } from '../message/message.model';
 import { MessagesService } from '../message/messages.service';
 import * as _ from 'lodash';
+import { User } from 'app/user/user.model';
+import { UsersService } from 'app/user/users.service';
 
 @Injectable()
 export class ThreadsService {
@@ -18,12 +20,22 @@ export class ThreadsService {
   currentThread: Subject<Thread> =
     new BehaviorSubject<Thread>(new Thread());
 
+  sendThread: Subject<Thread> =
+    new BehaviorSubject<Thread>(new Thread());
+
   // `currentThreadMessages` contains the set of messages for the currently
   // selected thread
   currentThreadMessages: Observable<Message[]>;
+  currentUnreadMessages: Observable<Message[]>;
+  currenUser: User;
 
-  constructor(public messagesService: MessagesService) {
+  constructor(public messagesService: MessagesService,public userService:UsersService) {
 
+    this.userService.currentUser.subscribe(
+      user => {
+        this.currenUser = user;
+      }
+    )
     this.threads = messagesService.messages
       .map( (messages: Message[]) => {
         const threads: {[key: string]: Thread} = {};
@@ -47,28 +59,57 @@ export class ThreadsService {
         const threads: Thread[] = _.values(threadGroups);
         return _.sortBy(threads, (t: Thread) => t.lastMessage.sentAt).reverse();
       });
-
+    this.currentUnreadMessages = messagesService.messages.combineLatest(
+      (messages:Message[])=>{
+        
+        if(messages.length > 0 ){
+          
+          return _.chain(messages)
+          .filter((message: Message) =>{
+              return (message.isRead === false);
+            }
+          )
+          .value();
+        }else{
+          return [];
+        }
+      }
+    );
     this.currentThreadMessages = this.currentThread
       .combineLatest(messagesService.messages,
                      (currentThread: Thread, messages: Message[]) => {
-        if (currentThread && messages.length > 0) {
+                       console.log(currentThread);
+        if (currentThread.name && messages.length > 0) {
           return _.chain(messages)
-            .filter((message: Message) =>
-                    (message.thread.id === currentThread.id))
+            .filter((message: Message) =>{
+                return (message.thread.id === currentThread.id);
+              }
+            )
             .map((message: Message) => {
               message.isRead = true;
               return message; })
             .value();
-        } else {
+        } else if(messages.length > 0){
+          return _.chain(messages)
+          .filter((message: Message) =>{
+              return (message.isRead === false && message.author !== this.currenUser);
+            }
+          )
+          .value();
+        }else{
           return [];
         }
       });
-
+      // console.log(this.currentThreadMessages);
     this.currentThread.subscribe(this.messagesService.markThreadAsRead);
   }
 
   setCurrentThread(newThread: Thread): void {
     this.currentThread.next(newThread);
+  }
+
+  setSendThread(thread: Thread): void {
+    this.sendThread.next(thread);
   }
 
 }

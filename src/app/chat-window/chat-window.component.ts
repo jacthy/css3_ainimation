@@ -20,17 +20,20 @@ import { MessagesService } from '../message/messages.service';
   styleUrls: ['./chat-window.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
+
 export class ChatWindowComponent implements OnInit {
   messages: Observable<any>;
   currentThread: Thread;
   draftMessage: Message;
   currentUser: User;
+ 
 
   constructor(public messagesService: MessagesService,
               public threadsService: ThreadsService,
               public UsersService: UsersService,
               public el: ElementRef) {
   }
+
 
   ngOnInit(): void {
     this.messages = this.threadsService.currentThreadMessages;
@@ -55,6 +58,7 @@ export class ChatWindowComponent implements OnInit {
             this.scrollToBottom();
           });
         });
+
   }
 
   onEnter(event: any): void {
@@ -64,6 +68,7 @@ export class ChatWindowComponent implements OnInit {
 
   sendMessage(): void {
     const m: Message = this.draftMessage;
+    // console.log(this.currentThread);
     m.author = this.currentUser;
     m.thread = this.currentThread;
     m.isRead = true;

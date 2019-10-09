@@ -6,6 +6,7 @@ import { HttpModule } from '@angular/http';
 import { UsersService } from './user/users.service';
 import { ThreadsService } from './thread/threads.service';
 import { MessagesService } from './message/messages.service';
+import { SendMessageService } from './send-message/send-service.service'
 
 import { AppComponent } from './app.component';
 import { ChatMessageComponent } from './chat-message/chat-message.component';
@@ -15,6 +16,7 @@ import { ChatThreadsComponent } from './chat-threads/chat-threads.component';
 import { ChatWindowComponent } from './chat-window/chat-window.component';
 import { ChatPageComponent } from './chat-page/chat-page.component';
 import { FromNowPipe } from './pipes/from-now.pipe';
+import { from } from 'rxjs/observable/from';
 
 @NgModule({
   declarations: [
@@ -33,7 +35,7 @@ import { FromNowPipe } from './pipes/from-now.pipe';
     HttpModule
   ],
   providers: [
-    MessagesService, ThreadsService, UsersService
+    MessagesService, ThreadsService, UsersService,SendMessageService
   ],
 
   bootstrap: [AppComponent]

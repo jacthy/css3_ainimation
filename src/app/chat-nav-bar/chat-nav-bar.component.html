@@ -2,14 +2,21 @@
   <div class="container-fluid">
     <div class="navbar-header">
       <a class="navbar-brand" href="https://ng-book.com/2">
-        <img src="assets/images/logos/ng-book-2-minibook.png"/>
-         ng-book 2
+        <img src="assets/images/logos/ng-book-2-minibook.png" />
+        ng-book 2
       </a>
     </div>
-    <p class="navbar-text navbar-right">
-      <button class="btn btn-primary" type="button">
+    <li class="navbar-text navbar-right" style="list-style: none">
+
+        <div class="input-group form-group">
+            <span class="btn input-group-addon" *ngFor = "let thread of threadList ;" (click)="fromWho($event,thread)"> {{thread.name}}</span>
+            <input type="text" class="form-control" [value]="'From:'+sendThread.name" [(ngModel)]="messageText" [disabled]="!sendThread">
+            <span class="input-group-addon btn" (click)="sendToMe($event)">Send to Me</span>
+        </div>
+
+      <button class="btn btn-primary" type="button" (click)="checkUnreadMessage()" >
         Messages <span class="badge">{{ unreadMessagesCount }}</span>
       </button>
-    </p>
+    </li>
   </div>
 </nav>

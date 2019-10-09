@@ -31,10 +31,10 @@ export class MessagesService {
     this.messages = this.updates
       // watch the updates and accumulate operations on the messages
       .scan((messages: Message[],
-             operation: IMessagesOperation) => {
-               return operation(messages);
-             },
-            initialMessages)
+        operation: IMessagesOperation) => {
+        return operation(messages);
+      },
+        initialMessages)
       // make sure we can share the most recent list of messages across anyone
       // who's interested in subscribing and cache the last known list of
       // messages
@@ -56,7 +56,7 @@ export class MessagesService {
     // entirely. The pros are that it is potentially clearer. The cons are that
     // the stream is no longer composable.
     this.create
-      .map( function(message: Message): IMessagesOperation {
+      .map(function (message: Message): IMessagesOperation {
         return (messages: Message[]) => {
           return messages.concat(message);
         };
@@ -69,9 +69,9 @@ export class MessagesService {
     // similarly, `markThreadAsRead` takes a Thread and then puts an operation
     // on the `updates` stream to mark the Messages as read
     this.markThreadAsRead
-      .map( (thread: Thread) => {
+      .map((thread: Thread) => {
         return (messages: Message[]) => {
-          return messages.map( (message: Message) => {
+          return messages.map((message: Message) => {
             // note that we're manipulating `message` directly here. Mutability
             // can be confusing and there are lots of reasons why you might want
             // to, say, copy the Message object or some other 'immutable' here
@@ -94,10 +94,20 @@ export class MessagesService {
   messagesForThreadUser(thread: Thread, user: User): Observable<Message> {
     return this.newMessages
       .filter((message: Message) => {
-               // belongs to this thread
+        // belongs to this thread
         return (message.thread.id === thread.id) &&
-               // and isn't authored by this user
-               (message.author.id !== user.id);
+          // and isn't authored by this user
+          (message.author.id !== user.id);
+      });
+  }
+
+  messagesForThreadUnRead(thread: Thread,user:User): Observable<Message> {
+    return this.newMessages
+      .filter((message: Message) => {
+        // belongs to this thread
+        return (message.isRead === false) &&
+          // and isn't authored by this user
+          (message.author.id !== user.id);
       });
   }
 }

@@ -10,9 +10,13 @@ import { User } from './user.model';
 export class UsersService {
   // `currentUser` contains the current user
   currentUser: Subject<User> = new BehaviorSubject<User>(null);
+  senderUser:Subject<User> = new BehaviorSubject<User>(null);
 
   public setCurrentUser(newUser: User): void {
     this.currentUser.next(newUser);
+  }
+  public setSenderUser(sender:User):void{
+    this.senderUser.next(sender);
   }
 }
 
